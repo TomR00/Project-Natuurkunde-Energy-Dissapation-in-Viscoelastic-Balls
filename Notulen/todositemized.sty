@@ -1,0 +1,96 @@
+%%%%% README:
+% Zet mij in je ShareLatex of in dezelfde folder als je .tex file, bij je nieuwe notulen
+% Vervolgens zet je in je main .tex file \usepackage{todositemized}
+%
+% Je krijgt een itemize met "\fail"s terug op de vorige webpagina. Als een actiepunt is voltooid verander je de "\fail" in "\done". Zowel "\fail" als "\done" gedragen zich als een "\item".
+% Voltooide actiepunten zie je vervolgens niet in de lijst van actiepunten aan het einde!
+%
+%
+% Voorbeeld:
+%
+% \section{Oude actiepunten}
+% \begin{itemize}
+%   \fail{Iedereen}{Op tijd komen}
+%   \fail{Jelle}[\pk]{Met Kelly op zijn rug naar G en terug rennen}. Random dingen kunnen ook vlak erna, doe wat je wilt.
+%   \fail{Ismani}{Stroopwafels meenemen naar de vergadering}
+%   \done{Ismani}[2016-02-24]{LIMO-website bouwen}
+% \end{itemize}
+%
+% Geschreven door Ismani Nieuweboer
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\ProvidesPackage{todositemized}
+\RequirePackage{minutes} % duh
+\RequirePackage{bbding} % voor een kruisje en vinkje
+
+
+%% Voor belangrijke actiepunten
+\RequirePackage[usenames,dvipsnames]{xcolor}
+\newcommand*{\pk}{{\color{Brown}\textbf{{Pannenkoek}}}}
+\newcommand*{\asap}{{\color{BrickRed}\textbf{{ASAP}}}}
+
+
+
+%% Voor de rest is code gekopieerd uit de broncode voor minutes package en aangepast
+\newcommand{\fail}[2][\relax]{
+\def\min@failDone{#1}
+\def\min@failWho{#2}
+\item[\XSolidBrush]
+\min@fail
+}
+
+\newcommand{\min@fail}[2][\relax]{
+\def\min@failWhen{#1}
+\def\min@failWhat{#2}
+\ifx\relax\min@file
+    \def\min@fileinfo{}
+\else
+    \def\min@fileinfo{\min@file/\the\inputlineno}
+\fi
+\def\min@space{}
+%  \par\noindent\textbf{\min@textTask}%
+% \if\relax\min@failWhen\else\ (\min@failWhen)\fi%
+\if\relax\min@failWhen\else\ \min@failWhen : \fi%
+\if\relax\min@failDone{%
+\@ifundefined{chapter}{%
+\addcontentsline{minTsk}{task}{\protect\minutestask%
+   {\min@failWhat}{\thepart}{\min@failWhen}%
+   {\min@failWho}{\min@date}{\min@fileinfo}}%
+}{%
+\addcontentsline{minTsk}{task}{\protect\minutestask%
+   {\min@failWhat}{\thechapter}{\min@failWhen}%
+   {\min@failWho}{\min@date}{\min@fileinfo}}%
+}%chapter defined
+}\else%\relax\min@failDone
+\ifx\min@space\min@failDone\else\footnote{\min@failDone}\fi%
+\fi%\relax\min@failDone
+% :
+\min@failWhat\
+\if*\min@failWho\else (\min@failWho)\fi
+}
+
+
+
+\newcommand{\done}[2][\relax]{
+\def\min@doneDone{#1}
+\def\min@doneWho{#2}
+\item[\Checkmark]
+\min@done
+}
+
+\newcommand{\min@done}[2][\relax]{
+\def\min@doneWhen{#1}
+\def\min@doneWhat{#2}
+\ifx\relax\min@file
+    \def\min@fileinfo{}
+\else
+    \def\min@fileinfo{\min@file/\the\inputlineno}
+\fi
+\def\min@space{}
+% \par\noindent\textbf{\min@textTask}%
+\if\relax\min@doneWhen\else\ \min@doneWhen : \fi%
+% :
+\min@doneWhat\
+\if*\min@doneWho\else (\min@doneWho)\fi
+}
